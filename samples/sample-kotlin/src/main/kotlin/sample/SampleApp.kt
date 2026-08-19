@@ -11,7 +11,7 @@ import kiit.jsonx.element.JsonXElement.JsonXObject
 import kiit.jsonx.element.JsonXElement.JsonXString
 import kiit.jsonx.error.JsonXError
 import kiit.jsonx.error.JsonXResult
-import kiit.jsonx.parser.state.LexerState
+import kiit.jsonx.parser.core.LexerState
 import kiit.result.Failure
 import kiit.result.Success
 
