@@ -1,5 +1,5 @@
 /** url: www.kiit.dev */
-package kiit.jsonx.parser.state
+package kiit.jsonx.parser.core
 
 /**
  * A single point in source text, captured via [LexerState.snapshot].

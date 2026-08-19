@@ -4,7 +4,7 @@ package kiit.jsonx.parser.json
 import kiit.jsonx.element.JsonXElement.JsonXNumber
 
 /**
- * Decodes raw [JsonLexer]-produced [Token.text] slices into real values — a string token's
+ * Decodes raw [JsonLexer]-produced `Token.text` slices into real values — a string token's
  * quotes and escape sequences, a number token's digits.
  *
  * Pure functions of their input text: no dependency on lexer/parser state, since [JsonLexer]

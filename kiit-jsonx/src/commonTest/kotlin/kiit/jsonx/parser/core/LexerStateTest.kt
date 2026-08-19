@@ -1,4 +1,4 @@
-package kiit.jsonx.parser.state
+package kiit.jsonx.parser.core
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

@@ -1,5 +1,5 @@
 /** url: www.kiit.dev */
-package kiit.jsonx.parser.state
+package kiit.jsonx.parser.core
 
 /**
  * Tracks which object keys have been seen so far while parsing a single JSON object.

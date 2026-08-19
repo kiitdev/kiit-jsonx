@@ -4,8 +4,10 @@ package kiit.jsonx.parser.json
 import kiit.codes.Err
 import kiit.jsonx.error.JsonXError
 import kiit.jsonx.error.JsonXParseException
-import kiit.jsonx.parser.state.LexerState
-import kiit.jsonx.parser.state.SourcePosition
+import kiit.jsonx.parser.core.LexerState
+import kiit.jsonx.parser.core.SourcePosition
+import kiit.jsonx.parser.core.Token
+import kiit.jsonx.parser.core.TokenType
 
 /**
  * Tokenizes strict RFC 8259 JSON text into a stream of [Token]s, one [nextToken] call at a time.

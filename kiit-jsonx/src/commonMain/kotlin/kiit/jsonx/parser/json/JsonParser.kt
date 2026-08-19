@@ -13,8 +13,10 @@ import kiit.jsonx.error.JsonXError
 import kiit.jsonx.error.JsonXParseException
 import kiit.jsonx.error.JsonXResult
 import kiit.jsonx.options.ParseOptions
-import kiit.jsonx.parser.state.DuplicateKeyTracker
-import kiit.jsonx.parser.state.SourcePosition
+import kiit.jsonx.parser.core.DuplicateKeyTracker
+import kiit.jsonx.parser.core.SourcePosition
+import kiit.jsonx.parser.core.Token
+import kiit.jsonx.parser.core.TokenType
 import kiit.result.Failure
 import kiit.result.Success
 

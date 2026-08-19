@@ -1,5 +1,5 @@
 /** url: www.kiit.dev */
-package kiit.jsonx.parser.state
+package kiit.jsonx.parser.core
 
 /**
  * Tracks offset/line/column position while walking a source [CharSequence] one character at a

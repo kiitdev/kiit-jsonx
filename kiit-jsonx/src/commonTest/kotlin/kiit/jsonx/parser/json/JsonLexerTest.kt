@@ -1,6 +1,8 @@
 package kiit.jsonx.parser.json
 
 import kiit.jsonx.error.JsonXParseException
+import kiit.jsonx.parser.core.Token
+import kiit.jsonx.parser.core.TokenType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
