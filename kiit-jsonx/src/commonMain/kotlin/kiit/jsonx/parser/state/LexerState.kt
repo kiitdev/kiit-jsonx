@@ -63,4 +63,7 @@ class LexerState(private val text: CharSequence) {
 
     /** Captures the current position as an immutable [SourcePosition]. */
     fun snapshot(): SourcePosition = SourcePosition(offset, line, column)
+
+    /** Returns the raw source text from [from] (inclusive) to [to] (exclusive), defaulting to the current [offset]. */
+    fun slice(from: Int, to: Int = offset): String = text.subSequence(from, to).toString()
 }
