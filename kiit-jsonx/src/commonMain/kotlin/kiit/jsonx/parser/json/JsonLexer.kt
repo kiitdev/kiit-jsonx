@@ -37,8 +37,14 @@ import kiit.jsonx.parser.core.TokenType
 open class JsonLexer(text: CharSequence) {
     protected val state: LexerState = LexerState(text)
 
-    /** Derived from [TokenType.ch] so the char↔type mapping has exactly one source of truth. */
-    private val singlePunctuationTokens: Map<Char, TokenType> =
+    /**
+     * Lookup for the six single-character token types (`{`, `}`, `[`, `]`, `:`, `,`), derived
+     * from [TokenType.ch] rather than hand-listed here, so the char↔type association has exactly
+     * one source of truth. Using a map lookup in [nextToken] instead of six `c == 'x'` branches
+     * also keeps that method's branch count down. `protected`, not `private`, so [Json5Lexer]
+     * inherits it as-is — JSON5 adds no new single-char punctuation over strict JSON.
+     */
+    protected val singlePunctuationTokens: Map<Char, TokenType> =
         TokenType.entries.mapNotNull { type -> type.ch?.let { it to type } }.toMap()
 
     /**
@@ -53,9 +59,10 @@ open class JsonLexer(text: CharSequence) {
         if (state.isAtEnd()) return Token(TokenType.JEndOfInput, "", state.snapshot())
 
         val position = state.snapshot()
-        val c = state.peek()!!
+        val c = state.peek()!! // peek only, so nothing is consumed until we know what c starts
 
         singlePunctuationTokens[c]?.let { type ->
+            // Now that we know it's a one-char token, consume that one char and return.
             state.advance()
             return Token(type, c.toString(), position)
         }
@@ -87,7 +94,7 @@ open class JsonLexer(text: CharSequence) {
      * yet). [quote] is parameterized so [Json5Lexer] can reuse this for single-quoted strings.
      * Returns the raw source slice, quotes included, as [Token.text] — see [Token]'s KDoc.
      */
-    protected fun readString(position: SourcePosition, quote: Char = '"'): Token {
+    protected open fun readString(position: SourcePosition, quote: Char = '"'): Token {
         state.advance() // opening quote
 
         while (true) {
@@ -114,14 +121,14 @@ open class JsonLexer(text: CharSequence) {
         if (state.isAtEnd()) return false
         return when (state.advance()) {
             '"', '\\', '/', 'b', 'f', 'n', 'r', 't' -> true
-            'u' -> skipUnicodeEscape()
+            'u' -> skipFixedHexDigits(4)
             else -> false
         }
     }
 
-    /** Consumes (without decoding) exactly 4 hex digits following `\u`. */
-    private fun skipUnicodeEscape(): Boolean {
-        repeat(4) {
+    /** Consumes (without decoding) exactly [count] hex digits. */
+    protected fun skipFixedHexDigits(count: Int): Boolean {
+        repeat(count) {
             val c = state.peek() ?: return false
             if (!isHexDigit(c)) return false
             state.advance()
@@ -129,7 +136,7 @@ open class JsonLexer(text: CharSequence) {
         return true
     }
 
-    private fun isHexDigit(c: Char): Boolean = c in '0'..'9' || c in 'a'..'f' || c in 'A'..'F'
+    protected fun isHexDigit(c: Char): Boolean = c in '0'..'9' || c in 'a'..'f' || c in 'A'..'F'
 
     /**
      * Reads a strict JSON number: `-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?`. No leading `+`, no
@@ -211,7 +218,7 @@ open class JsonLexer(text: CharSequence) {
         )
     }
 
-    private fun Char.isAsciiDigit(): Boolean = this in '0'..'9'
+    protected fun Char.isAsciiDigit(): Boolean = this in '0'..'9'
 
-    private fun Char.isAsciiLetter(): Boolean = this in 'a'..'z' || this in 'A'..'Z'
+    protected fun Char.isAsciiLetter(): Boolean = this in 'a'..'z' || this in 'A'..'Z'
 }

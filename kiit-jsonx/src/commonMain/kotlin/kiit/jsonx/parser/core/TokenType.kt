@@ -30,6 +30,9 @@ enum class TokenType(val ch: Char? = null) {
     JFalse,
     JNull,
 
+    /** An unquoted identifier-style token — e.g. a JSON5 unquoted object key. Not produced by strict JSON. */
+    JIdentifier,
+
     /** Terminal — once `JsonLexer.nextToken` returns this, every later call returns it again. */
     JEndOfInput,
 }
