@@ -29,6 +29,10 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
+        jvmTest.dependencies {
+            // Only for reading the vendored jju portable-suite YAML — see Json5ConformanceTest.
+            implementation(libs.snakeyaml)
+        }
     }
 }
 
