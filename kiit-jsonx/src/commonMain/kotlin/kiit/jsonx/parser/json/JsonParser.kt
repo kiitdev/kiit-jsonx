@@ -23,18 +23,16 @@ import kiit.result.Success
 /**
  * Recursive-descent parser consuming [JsonLexer] tokens into a [JsonXElement] tree.
  *
- * Like [JsonLexer], this signals failure by throwing [JsonXParseException] internally rather
- * than threading [JsonXResult] through every recursive call. See that class's KDoc for why.
- * [Companion.parse] is the actual public boundary: the one place that catches
- * [JsonXParseException] and converts it into a real [JsonXResult.Failure].
- *
- * Delegates decoding raw [Token.text] into real values to [JsonDecoder]. Tree-shape/grammar
- * and raw-text decoding are independent concerns, and [Json5Parser] (Milestone 2.4) will likely
- * need its own decoder (e.g. for hex numbers) without needing its own copy of this class's
- * grammar logic.
- *
- * `open`/`protected` throughout for [Json5Parser] to extend rather than reimplement, same
- * extension-point philosophy as [JsonLexer].
+ * 1. Signals failure by throwing [JsonXParseException] internally rather than threading
+ *    [JsonXResult] through every recursive call, same as [JsonLexer] (see that class's KDoc
+ *    for why). [Companion.parse] is the public boundary: the one place that catches it and
+ *    converts it into a real [JsonXResult.Failure].
+ * 2. Delegates decoding raw [Token.text] into real values to [JsonDecoder]. Tree-shape/grammar
+ *    and raw-text decoding are independent concerns, and [Json5Parser] (Milestone 2.4) will
+ *    likely need its own decoder (e.g. for hex numbers) without its own copy of this class's
+ *    grammar logic.
+ * 3. `open`/`protected` throughout for [Json5Parser] to extend rather than reimplement, same
+ *    extension-point philosophy as [JsonLexer].
  */
 open class JsonParser(
     private val lexer: JsonLexer,

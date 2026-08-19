@@ -11,21 +11,20 @@ import kiit.jsonx.parser.core.TokenType
 
 /**
  * Tokenizes strict RFC 8259 JSON text into a stream of [Token]s, one [nextToken] call at a time.
- * Produces tokens only. Building a [kiit.jsonx.element.JsonXElement] tree from them is
- * [kiit.jsonx.parser.json]'s parser, Milestone 2.2.
  *
- * Validates grammar (string escapes, number shape) but never decodes it. Every [Token.text] is
- * the raw source slice, untouched. Turning that into a real `String`/`Long`/`Double` is the
- * parser's job.
- *
- * Signals a lex failure by throwing [JsonXParseException], not by returning a `JsonXResult`.
- * See that class's KDoc for why. This is purely an internal control-flow detail: the module's
- * public entry point (the future `JsonParser.parse`) catches it and converts it into a real
- * `JsonXResult.Failure`; nothing about [JsonXParseException] is part of this library's public API.
- *
- * `open` and its `protected` read helpers are extension points for [Json5Lexer] (Milestone 2.3)
- * to layer JSON5's additions (comments, unquoted keys, single-quoted strings, hex numbers, ...)
- * on top of rather than re-implementing this class from scratch.
+ * 1. Produces tokens only. Building a [kiit.jsonx.element.JsonXElement] tree from them is
+ *    [kiit.jsonx.parser.json]'s parser, Milestone 2.2.
+ * 2. Validates grammar (string escapes, number shape) but never decodes it. Every [Token.text]
+ *    is the raw source slice, untouched; turning that into a real `String`/`Long`/`Double` is
+ *    the parser's job.
+ * 3. Signals a lex failure by throwing [JsonXParseException] rather than returning a
+ *    `JsonXResult`; see that class's KDoc for why. The module's public entry point (the future
+ *    `JsonParser.parse`) catches it and converts it into a real `JsonXResult.Failure`, so none
+ *    of this is part of the library's public API.
+ * 4. `open` and its `protected` read helpers are extension points for [Json5Lexer]
+ *    (Milestone 2.3), letting it layer JSON5's additions (comments, unquoted keys,
+ *    single-quoted strings, hex numbers, ...) on top rather than re-implementing this class
+ *    from scratch.
  *
  * Naming convention for helpers in this class and its dialect subclasses:
  * - `readX`: consumes a sequence of characters that becomes part of a token's content

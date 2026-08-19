@@ -19,11 +19,12 @@ import kiit.result.Success
  * two relaxations: trailing commas in objects and arrays, and unquoted identifier-style object
  * keys (in addition to quoted string keys).
  *
- * Only [parseObject]/[parseArray] are overridden. [JsonParser.parseValue]/`parseString`/
- * `parseNumber` are inherited unchanged. Number/string decoding already comes out
- * JSON5-correct because [Json5Decoder] is injected as the `decoder`, not because this class
- * does anything differently, and a bare identifier is only valid in key position: `parseValue`'s
- * inherited fallthrough already rejects one anywhere else, exactly as JSON5 requires.
+ * 1. Only [parseObject]/[parseArray] are overridden. [JsonParser.parseValue]/`parseString`/
+ *    `parseNumber` are inherited unchanged.
+ * 2. Number/string decoding already comes out JSON5-correct because [Json5Decoder] is injected
+ *    as the `decoder`, not because this class does anything differently.
+ * 3. A bare identifier is only valid in key position: `parseValue`'s inherited fallthrough
+ *    already rejects one anywhere else, exactly as JSON5 requires.
  */
 open class Json5Parser(lexer: JsonLexer, options: ParseOptions = ParseOptions()) :
     JsonParser(lexer, options, Json5Decoder()) {

@@ -8,18 +8,19 @@ import kiit.jsonx.parser.json.JsonLexer
 
 /**
  * Tokenizes [JSON5](https://json5.org) text, extending [JsonLexer] with:
- * - `//` line comments and `/* */` block comments.
- * - Unquoted, identifier-style object keys (produced as [TokenType.JIdentifier]; a bare
- *   identifier is only meaningful in key position, which is [kiit.jsonx.parser.json5.Json5Parser]'s job to
- *   enforce, not the lexer's).
- * - Single-quoted strings, in addition to double-quoted.
- * - `Infinity`/`NaN` (with an optional leading `+`/`-`) as [TokenType.JNumber] tokens.
- * - Hex number literals (`0x1A`), leading/trailing decimal points (`.5`, `5.`), and a leading `+`.
- * - Line continuation (`\` + line terminator) inside strings, so a string can span source lines.
- * - JSON5's wider whitespace set: `<VT>`, `<FF>`, `<NBSP>`, `<BOM>`, any Unicode space-separator
- *   character, and (unlike strict JSON) `<LS>`/`<PS>` (U+2028/U+2029) count as whitespace too.
  *
- * Still validates rather than decodes. See [JsonLexer]'s KDoc for why. Decoding JSON5-specific
+ * 1. `//` line comments and `/* */` block comments.
+ * 2. Unquoted, identifier-style object keys (produced as [TokenType.JIdentifier]; a bare
+ *    identifier is only meaningful in key position, which is
+ *    [kiit.jsonx.parser.json5.Json5Parser]'s job to enforce, not the lexer's).
+ * 3. Single-quoted strings, in addition to double-quoted.
+ * 4. `Infinity`/`NaN` (with an optional leading `+`/`-`) as [TokenType.JNumber] tokens.
+ * 5. Hex number literals (`0x1A`), leading/trailing decimal points (`.5`, `5.`), and a leading `+`.
+ * 6. Line continuation (`\` + line terminator) inside strings, so a string can span source lines.
+ * 7. JSON5's wider whitespace set: `<VT>`, `<FF>`, `<NBSP>`, `<BOM>`, any Unicode space-separator
+ *    character, and (unlike strict JSON) `<LS>`/`<PS>` (U+2028/U+2029) count as whitespace too.
+ *
+ * Still validates rather than decodes; see [JsonLexer]'s KDoc for why. Decoding JSON5-specific
  * text (hex numbers, `Infinity`/`NaN`, line-continuation removal, the wider escape set) is
  * `Json5Decoder`'s job (Milestone 2.4), not this class's.
  */
