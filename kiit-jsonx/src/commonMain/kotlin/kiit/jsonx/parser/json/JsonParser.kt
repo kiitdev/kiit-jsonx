@@ -39,13 +39,13 @@ import kiit.result.Success
 open class JsonParser(
     private val lexer: JsonLexer,
     private val options: ParseOptions = ParseOptions(),
-    private val decoder: JsonDecoder = JsonDecoder(),
+    protected val decoder: JsonDecoder = JsonDecoder(),
 ) {
     protected var current: Token = lexer.nextToken()
         private set
 
     /** Current object/array nesting depth. See [enterNesting]. */
-    private var depth: Int = 0
+    protected var depth: Int = 0
 
     /** Parses the whole document. Empty (or whitespace-only) input yields an empty [JsonXObject]. */
     fun parseDocument(): JsonXElement {
@@ -151,7 +151,7 @@ open class JsonParser(
      * a [JsonXResult]" contract at [Companion.parse]. Each caller decrements [depth] again in
      * its own `finally` block.
      */
-    private fun enterNesting() {
+    protected fun enterNesting() {
         depth++
         if (depth > MAX_NESTING_DEPTH) parseError("exceeded max nesting depth of $MAX_NESTING_DEPTH")
     }
