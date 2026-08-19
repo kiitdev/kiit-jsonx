@@ -84,6 +84,13 @@ class JsonLexerTest {
         assertFailsWith<JsonXParseException> { JsonLexer("tru3").nextToken() }
     }
 
+    @Test
+    fun keyword_unrecognizedLetterStart_fails() {
+        // starts with a letter (routed into readKeyword) but doesn't match true/false/null's
+        // first character at all — a different failure path than a partial/malformed match.
+        assertFailsWith<JsonXParseException> { JsonLexer("xyz").nextToken() }
+    }
+
     // --- strings -------------------------------------------------------------------------------
 
     @Test

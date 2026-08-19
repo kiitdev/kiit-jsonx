@@ -53,9 +53,7 @@ open class JsonLexer(text: CharSequence) {
 
         return when {
             c == '"' -> readString(position)
-            c == 't' -> readKeyword(TokenType.JTrue, "true", position)
-            c == 'f' -> readKeyword(TokenType.JFalse, "false", position)
-            c == 'n' -> readKeyword(TokenType.JNull, "null", position)
+            c.isAsciiLetter() -> readKeyword(position)
             c == '-' || c.isAsciiDigit() -> readNumber(position)
             else -> lexError("unexpected character '$c'", position)
         }
@@ -174,8 +172,20 @@ open class JsonLexer(text: CharSequence) {
         while (state.peek()?.isAsciiDigit() == true) state.advance()
     }
 
-    /** Matches [keyword] (e.g. `"true"`) starting at [position], or fails if it doesn't match exactly. */
-    private fun readKeyword(type: TokenType, keyword: String, position: SourcePosition): Token {
+    /**
+     * Reads a keyword literal starting at [position], picking which one (`true`/`false`/`null`)
+     * from its first character, then matching the rest exactly. Fails on any other identifier-like
+     * text (e.g. `tru3`, or a letter that doesn't start any of the three keywords).
+     */
+    private fun readKeyword(position: SourcePosition): Token {
+        val (type, keyword) =
+            when (state.peek()) {
+                't' -> TokenType.JTrue to "true"
+                'f' -> TokenType.JFalse to "false"
+                'n' -> TokenType.JNull to "null"
+                else -> lexError("invalid literal: unexpected character '${state.peek()}'", position)
+            }
+
         for (expected in keyword) {
             if (state.isAtEnd() || state.peek() != expected) {
                 lexError("invalid literal, expected '$keyword'", position)
@@ -193,4 +203,6 @@ open class JsonLexer(text: CharSequence) {
     }
 
     private fun Char.isAsciiDigit(): Boolean = this in '0'..'9'
+
+    private fun Char.isAsciiLetter(): Boolean = this in 'a'..'z' || this in 'A'..'Z'
 }
