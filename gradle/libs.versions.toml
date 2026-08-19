@@ -1,0 +1,21 @@
+[versions]
+kotlin    = "2.3.21"
+ktlint    = "12.1.2"
+detekt    = "1.23.7"
+dokka     = "2.0.0"
+kover     = "0.9.1"
+snakeyaml = "2.6"
+
+[libraries]
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+# JVM-test-only: reads the vendored jju portable JSON5 YAML conformance suite. Never touches
+# the shipped library's own dependency footprint (commonMain has none, per the plan's design).
+snakeyaml   = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
+
+[plugins]
+kotlin-jvm          = { id = "org.jetbrains.kotlin.jvm",           version.ref = "kotlin" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+ktlint              = { id = "org.jlleitschuh.gradle.ktlint",      version.ref = "ktlint"  }
+detekt              = { id = "io.gitlab.arturbosch.detekt",        version.ref = "detekt"  }
+dokka               = { id = "org.jetbrains.dokka",                version.ref = "dokka"   }
+kover               = { id = "org.jetbrains.kotlinx.kover",        version.ref = "kover"   }
