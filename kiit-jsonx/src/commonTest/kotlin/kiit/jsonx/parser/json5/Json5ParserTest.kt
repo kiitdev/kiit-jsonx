@@ -86,6 +86,14 @@ class Json5ParserTest {
     }
 
     @Test
+    fun reservedWordKeys_areAcceptedAsIdentifierKeys() {
+        // null/true/false are reserved words in value position but valid ECMAScript
+        // IdentifierNames, so JSON5 allows them unquoted as object keys.
+        val result = parseDocument("{null: 1, true: 2, false: 3}") as JsonXObject
+        assertEquals(listOf("null", "true", "false"), result.entries.keys.toList())
+    }
+
+    @Test
     fun bareIdentifier_asValue_fails() {
         // unquoted identifiers are only valid in key position, never as a value
         assertFailsWith<JsonXParseException> { parseDocument("[foo]") }
