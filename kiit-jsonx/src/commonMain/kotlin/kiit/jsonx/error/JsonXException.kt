@@ -1,5 +1,5 @@
 /** url: www.kiit.dev */
-@file:JvmName("JsonxExceptions")
+@file:JvmName("JsonXExceptions")
 
 package kiit.jsonx.error
 
@@ -8,7 +8,7 @@ import kotlin.jvm.JvmName
 /**
  * Thin exception wrapper around a [JsonXError]. Reserved for the throwing extraction methods
  * added in Phase 3 (`getX`, as opposed to their non-throwing `getXOrElse`/`getXOrNull`
- * siblings) — those methods will be marked `@Throws(JsonxException::class)` for Kotlin/Native
+ * siblings) — those methods will be marked `@Throws(JsonXException::class)` for Kotlin/Native
  * (iOS) interop once that target lands in Phase 4.
  *
  * [JsonXResult]-returning operations (parse, tag resolution, transforms) never throw this.

@@ -14,7 +14,7 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertSame
 
 // =================================================================================================
-// JsonxElementTest: equality/construction for every JsonxElement variant
+// JsonXElementTest: equality/construction for every JsonXElement variant
 // =================================================================================================
 class JsonXElementTest {
     @Test

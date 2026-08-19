@@ -11,7 +11,7 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
 
 // =================================================================================================
-// JsonxErrorTest: JsonxError, JsonxResult, and JsonxException
+// JsonXErrorTest: JsonXError, JsonXResult, and JsonXException
 // =================================================================================================
 class JsonXErrorTest {
     @Test
@@ -40,7 +40,7 @@ class JsonXErrorTest {
     }
 
     @Test
-    fun jsonXResult_failure_carriesJsonxError() {
+    fun jsonXResult_failure_carriesJsonXError() {
         val error = JsonXError(Err.on("port", "abc", "expected a number"), line = 1, column = 8)
         val result: JsonXResult<Int> = Failure(error, Invalid.INVALID_VALUE)
 

@@ -8,7 +8,7 @@ package kiit.jsonx.element
  * Node names cosmetically mirror `kotlinx.serialization.json.JsonElement` — there is no
  * functional relationship or dependency between the two.
  *
- * No node carries a source position. Positions live only on `JsonxError` (see
+ * No node carries a source position. Positions live only on `JsonXError` (see
  * `kiit.jsonx.error`), never on the tree itself: a tree is a pure value, freely constructed,
  * merged, and compared independent of where (or whether) it came from parsed text.
  */
@@ -28,7 +28,7 @@ sealed class JsonXElement {
     data class JsonXNumber(val long: Long?, val double: Double?) : JsonXElement() {
         init {
             require((long == null) != (double == null)) {
-                "JsonxNumber requires exactly one of long/double to be non-null"
+                "JsonXNumber requires exactly one of long/double to be non-null"
             }
         }
 
