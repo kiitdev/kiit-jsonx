@@ -24,6 +24,13 @@ import kiit.jsonx.parser.state.SourcePosition
  * `open` and its `protected` read helpers are extension points for [Json5Lexer] (Milestone 2.3)
  * to layer JSON5's additions (comments, unquoted keys, single-quoted strings, hex numbers, ...)
  * on top of rather than re-implementing this class from scratch.
+ *
+ * Naming convention for helpers in this class and its dialect subclasses:
+ * - `readX` — consumes a sequence of characters that becomes part of a token's content
+ *   (`readNumber`, `readKeyword`, `readDigits`).
+ * - `isX`/`hasX` — a pure, non-consuming check ([isHexDigit]).
+ * - `skipX` — consumes characters without building a value from them ([skipInsignificant],
+ *   [skipUnicodeEscape], [skipEscape]).
  */
 open class JsonLexer(text: CharSequence) {
     protected val state: LexerState = LexerState(text)
@@ -92,7 +99,7 @@ open class JsonLexer(text: CharSequence) {
                 }
                 c == '\\' -> {
                     state.advance()
-                    if (!validateEscape()) lexError("invalid escape sequence", state.snapshot())
+                    if (!skipEscape()) lexError("invalid escape sequence", state.snapshot())
                 }
                 c.code < 0x20 -> lexError("unescaped control character in string", state.snapshot())
                 else -> state.advance()
@@ -100,8 +107,8 @@ open class JsonLexer(text: CharSequence) {
         }
     }
 
-    /** Validates one escape sequence, having already consumed the leading `\`. Does not decode it. */
-    private fun validateEscape(): Boolean {
+    /** Consumes one escape sequence, having already consumed the leading `\`. Does not decode it. */
+    private fun skipEscape(): Boolean {
         if (state.isAtEnd()) return false
         return when (state.advance()) {
             '"', '\\', '/', 'b', 'f', 'n', 'r', 't' -> true
@@ -110,7 +117,7 @@ open class JsonLexer(text: CharSequence) {
         }
     }
 
-    /** Validates (without decoding) exactly 4 hex digits following `\u`. */
+    /** Consumes (without decoding) exactly 4 hex digits following `\u`. */
     private fun skipUnicodeEscape(): Boolean {
         repeat(4) {
             val c = state.peek() ?: return false
