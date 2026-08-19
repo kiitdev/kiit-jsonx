@@ -24,16 +24,16 @@ import kiit.result.Success
  * Recursive-descent parser consuming [JsonLexer] tokens into a [JsonXElement] tree.
  *
  * Like [JsonLexer], this signals failure by throwing [JsonXParseException] internally rather
- * than threading [JsonXResult] through every recursive call — see that class's KDoc for why.
+ * than threading [JsonXResult] through every recursive call. See that class's KDoc for why.
  * [Companion.parse] is the actual public boundary: the one place that catches
  * [JsonXParseException] and converts it into a real [JsonXResult.Failure].
  *
- * Delegates decoding raw [Token.text] into real values to [JsonDecoder] — tree-shape/grammar
+ * Delegates decoding raw [Token.text] into real values to [JsonDecoder]. Tree-shape/grammar
  * and raw-text decoding are independent concerns, and [Json5Parser] (Milestone 2.4) will likely
  * need its own decoder (e.g. for hex numbers) without needing its own copy of this class's
  * grammar logic.
  *
- * `open`/`protected` throughout for [Json5Parser] to extend rather than reimplement — same
+ * `open`/`protected` throughout for [Json5Parser] to extend rather than reimplement, same
  * extension-point philosophy as [JsonLexer].
  */
 open class JsonParser(
@@ -44,7 +44,7 @@ open class JsonParser(
     protected var current: Token = lexer.nextToken()
         private set
 
-    /** Current object/array nesting depth — see [enterNesting]. */
+    /** Current object/array nesting depth. See [enterNesting]. */
     private var depth: Int = 0
 
     /** Parses the whole document. Empty (or whitespace-only) input yields an empty [JsonXObject]. */
@@ -85,7 +85,7 @@ open class JsonParser(
             expect(TokenType.JLBrace)
             val entries = LinkedHashMap<String, JsonXElement>()
 
-            // "{}" — an empty object, no entries to read.
+            // "{}": an empty object, no entries to read.
             if (current.type == TokenType.JRBrace) {
                 advance()
                 return JsonXObject(entries)
@@ -120,7 +120,7 @@ open class JsonParser(
             expect(TokenType.JLBracket)
             val items = mutableListOf<JsonXElement>()
 
-            // "[]" — an empty array, no items to read.
+            // "[]": an empty array, no items to read.
             if (current.type == TokenType.JRBracket) {
                 advance()
                 return JsonXArray(items)
@@ -146,7 +146,7 @@ open class JsonParser(
 
     /**
      * Tracks recursion [depth] on entry to [parseObject]/[parseArray], failing cleanly with a
-     * normal [parseError] past [MAX_NESTING_DEPTH] — instead of risking an uncatchable
+     * normal [parseError] past [MAX_NESTING_DEPTH], instead of risking an uncatchable
      * `StackOverflowError` on pathologically deep input, which would break the "always returns
      * a [JsonXResult]" contract at [Companion.parse]. Each caller decrements [depth] again in
      * its own `finally` block.
@@ -163,7 +163,7 @@ open class JsonParser(
     /**
      * Applies [ParseOptions.duplicateKeyPolicy] when [key] repeats within one object.
      * [CollectIntoArray][ParseOptions.DuplicateKeyPolicy.CollectIntoArray] is inherently
-     * ambiguous against a key whose *first* value is itself a real array — both end up
+     * ambiguous against a key whose *first* value is itself a real array: both end up
      * indistinguishable as a flat array of values. Accepted as a known limitation of the policy,
      * not something this method can resolve.
      */
@@ -213,7 +213,7 @@ open class JsonParser(
     }
 
     companion object {
-        /** Max object/array nesting depth — see [enterNesting]. Matches common practice (e.g. Jackson's default). */
+        /** Max object/array nesting depth, matching common practice (e.g. Jackson's default). See [enterNesting]. */
         const val MAX_NESTING_DEPTH: Int = 1000
 
         /** Parses [text] as strict JSON, converting any [JsonXParseException] into a [JsonXResult.Failure]. */

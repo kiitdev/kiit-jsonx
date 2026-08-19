@@ -9,16 +9,16 @@ import kotlin.test.fail
 
 /**
  * Runs [JsonParser] against the vendored `nst/JSONTestSuite` fixtures
- * (`src/jvmTest/resources/conformance/json/`, see `VENDORED.md` there) — an independently
+ * (`src/jvmTest/resources/conformance/json/`, see `VENDORED.md` there), an independently
  * authored conformance corpus, not just our own hand-written [kiit.jsonx.parser.json.JsonParserTest] cases.
  *
  * Naming convention (upstream's, not ours): `y_*.json` must parse successfully, `n_*.json` must
- * fail to parse, `i_*.json` is implementation-defined — either outcome is acceptable, so those
- * fixtures are exercised (must not hang or throw anything other than a normal parse failure) but
- * not asserted either way.
+ * fail to parse, `i_*.json` is implementation-defined. Either outcome is acceptable there, so
+ * those fixtures are exercised (must not hang or throw anything other than a normal parse
+ * failure) but not asserted either way.
  *
  * [knownDeviations] excepts a small, explicit set of fixtures where kiit-jsonx deliberately
- * disagrees with upstream's expected outcome — each already a decided design choice covered by
+ * disagrees with upstream's expected outcome, each already a decided design choice covered by
  * its own [kiit.jsonx.parser.json.JsonParserTest] case, not a parser bug to fix here.
  */
 class JsonConformanceTest {

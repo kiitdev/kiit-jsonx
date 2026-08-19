@@ -3,7 +3,7 @@ package kiit.jsonx.parser.core
 
 /**
  * Tracks offset/line/column position while walking a source [CharSequence] one character at a
- * time. Shared by every dialect's lexer (JSON, JSON5, jsonx, JsonL) — each layers its own token
+ * time. Shared by every dialect's lexer (JSON, JSON5, jsonx, JsonL). Each layers its own token
  * grammar on top rather than re-implementing position tracking.
  *
  * State is exposed through public read-only properties and methods rather than hidden behind a
@@ -37,7 +37,7 @@ class LexerState(private val text: CharSequence) {
 
     /**
      * Consumes and returns the current character, advancing [offset] and updating [line]/
-     * [column]. A `\r\n` pair is consumed together as a single line terminator — the `\n` half
+     * [column]. A `\r\n` pair is consumed together as a single line terminator. The `\n` half
      * of a pair is never left for a separate [advance] call to consume on its own.
      */
     fun advance(): Char {

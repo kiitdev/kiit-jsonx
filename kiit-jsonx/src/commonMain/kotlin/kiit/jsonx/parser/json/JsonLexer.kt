@@ -11,15 +11,15 @@ import kiit.jsonx.parser.core.TokenType
 
 /**
  * Tokenizes strict RFC 8259 JSON text into a stream of [Token]s, one [nextToken] call at a time.
- * Produces tokens only — building a [kiit.jsonx.element.JsonXElement] tree from them is
+ * Produces tokens only. Building a [kiit.jsonx.element.JsonXElement] tree from them is
  * [kiit.jsonx.parser.json]'s parser, Milestone 2.2.
  *
- * Validates grammar (string escapes, number shape) but never decodes it — every [Token.text] is
+ * Validates grammar (string escapes, number shape) but never decodes it. Every [Token.text] is
  * the raw source slice, untouched. Turning that into a real `String`/`Long`/`Double` is the
  * parser's job.
  *
- * Signals a lex failure by throwing [JsonXParseException], not by returning a `JsonXResult` —
- * see that class's KDoc for why. This is purely an internal control-flow detail: the module's
+ * Signals a lex failure by throwing [JsonXParseException], not by returning a `JsonXResult`.
+ * See that class's KDoc for why. This is purely an internal control-flow detail: the module's
  * public entry point (the future `JsonParser.parse`) catches it and converts it into a real
  * `JsonXResult.Failure`; nothing about [JsonXParseException] is part of this library's public API.
  *
@@ -28,10 +28,10 @@ import kiit.jsonx.parser.core.TokenType
  * on top of rather than re-implementing this class from scratch.
  *
  * Naming convention for helpers in this class and its dialect subclasses:
- * - `readX` — consumes a sequence of characters that becomes part of a token's content
+ * - `readX`: consumes a sequence of characters that becomes part of a token's content
  *   (`readNumber`, `readKeyword`, `readDigits`).
- * - `isX`/`hasX` — a pure, non-consuming check ([isHexDigit]).
- * - `skipX` — consumes characters without building a value from them ([skipInsignificant],
+ * - `isX`/`hasX`: a pure, non-consuming check ([isHexDigit]).
+ * - `skipX`: consumes characters without building a value from them ([skipInsignificant],
  *   [skipUnicodeEscape], [skipEscape]).
  */
 open class JsonLexer(text: CharSequence) {
@@ -42,14 +42,14 @@ open class JsonLexer(text: CharSequence) {
      * from [TokenType.ch] rather than hand-listed here, so the char↔type association has exactly
      * one source of truth. Using a map lookup in [nextToken] instead of six `c == 'x'` branches
      * also keeps that method's branch count down. `protected`, not `private`, so [Json5Lexer]
-     * inherits it as-is — JSON5 adds no new single-char punctuation over strict JSON.
+     * inherits it as-is. JSON5 adds no new single-char punctuation over strict JSON.
      */
     protected val singlePunctuationTokens: Map<Char, TokenType> =
         TokenType.entries.mapNotNull { type -> type.ch?.let { it to type } }.toMap()
 
     /**
      * Returns the next token. Throws [JsonXParseException] if the text at the current position
-     * doesn't start a valid token — see the class KDoc for why this isn't a `JsonXResult`.
+     * doesn't start a valid token. See the class KDoc for why this isn't a `JsonXResult`.
      *
      * Once [TokenType.JEndOfInput] is returned, every subsequent call returns it again rather
      * than re-scanning past the end.
@@ -77,7 +77,7 @@ open class JsonLexer(text: CharSequence) {
 
     /**
      * Advances past whitespace (and, for dialects layered on top, comments). Strict JSON
-     * whitespace is exactly space, tab, `\n`, `\r` — U+2028/U+2029 are not JSON whitespace, they
+     * whitespace is exactly space, tab, `\n`, `\r`. U+2028/U+2029 are not JSON whitespace; they
      * only affect [LexerState]'s line/column bookkeeping.
      */
     protected open fun skipInsignificant() {
@@ -92,7 +92,7 @@ open class JsonLexer(text: CharSequence) {
     /**
      * Reads a quoted string starting at [position] (the opening [quote] has not been consumed
      * yet). [quote] is parameterized so [Json5Lexer] can reuse this for single-quoted strings.
-     * Returns the raw source slice, quotes included, as [Token.text] — see [Token]'s KDoc.
+     * Returns the raw source slice, quotes included, as [Token.text]. See [Token]'s KDoc.
      */
     protected open fun readString(position: SourcePosition, quote: Char = '"'): Token {
         state.advance() // opening quote
@@ -140,9 +140,9 @@ open class JsonLexer(text: CharSequence) {
 
     /**
      * Reads a strict JSON number: `-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?`. No leading `+`, no
-     * leading zeros before a nonzero digit, no bare leading/trailing decimal point — those are
+     * leading zeros before a nonzero digit, no bare leading/trailing decimal point. Those are
      * JSON5 relaxations, added by [Json5Lexer] overriding this method rather than here. Returns
-     * the raw source slice as [Token.text] — see [Token]'s KDoc.
+     * the raw source slice as [Token.text]. See [Token]'s KDoc.
      */
     protected open fun readNumber(position: SourcePosition): Token {
         if (state.peek() == '-') state.advance()
@@ -211,7 +211,7 @@ open class JsonLexer(text: CharSequence) {
         return Token(type, keyword, position)
     }
 
-    /** Throws [JsonXParseException] for a lex failure at [position] — never returns. */
+    /** Throws [JsonXParseException] for a lex failure at [position]. Never returns. */
     protected fun lexError(message: String, position: SourcePosition): Nothing {
         throw JsonXParseException(
             JsonXError(Err.of(message), line = position.line, column = position.column, offset = position.offset),

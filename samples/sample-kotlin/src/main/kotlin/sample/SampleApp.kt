@@ -16,10 +16,10 @@ import kiit.result.Failure
 import kiit.result.Success
 
 /**
- * Phase 1 of kiit-jsonx has no parser yet (see ../../_prd/jsonx) — just the [JsonXElement] tree
- * shape, [JsonXResult]/[JsonXError] error handling, and [LexerState]'s position tracking. This
- * sample hand-builds a tree to show that shape end to end. A later phase will replace
- * [sampleConfig] with an actual `JsonX.parse(...)` call over real source text.
+ * kiit-jsonx now has a real `JsonParser` (see `kiit.jsonx.parser.json`), but this sample still
+ * hand-builds its tree to keep the focus on the [JsonXElement] shape, [JsonXResult]/[JsonXError]
+ * error handling, and [LexerState]'s position tracking, rather than on parsing itself. See
+ * `_prd/jsonx` for what each phase covers.
  */
 fun main() {
     val config = sampleConfig()

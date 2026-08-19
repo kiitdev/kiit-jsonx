@@ -4,7 +4,7 @@ package kiit.jsonx.options
 /**
  * Parse-time configuration, threaded through every dialect's parser.
  *
- * Stubbed in Phase 1 with just [duplicateKeyPolicy] and [retainComments] — `tagRegistry` and
+ * Stubbed in Phase 1 with just [duplicateKeyPolicy] and [retainComments]. `tagRegistry` and
  * `transforms` are added in Phase 3, `enabledStdTags` in Phase 4.
  */
 data class ParseOptions(

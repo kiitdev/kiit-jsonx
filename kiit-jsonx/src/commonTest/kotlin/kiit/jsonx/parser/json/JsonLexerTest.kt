@@ -89,7 +89,7 @@ class JsonLexerTest {
     @Test
     fun keyword_unrecognizedLetterStart_fails() {
         // starts with a letter (routed into readKeyword) but doesn't match true/false/null's
-        // first character at all — a different failure path than a partial/malformed match.
+        // first character at all, a different failure path than a partial/malformed match.
         assertFailsWith<JsonXParseException> { JsonLexer("xyz").nextToken() }
     }
 
@@ -215,7 +215,7 @@ class JsonLexerTest {
 
     @Test
     fun number_soleZero_isACompleteNumberToken() {
-        // strict JSON forbids leading zeros ("01" is invalid) — that grammar rule lives at the
+        // strict JSON forbids leading zeros ("01" is invalid). That grammar rule lives at the
         // digit level (readIntegerPart), not as a lexer-vs-parser boundary concern; a lone "0" is
         // simply a complete, valid number token on its own.
         val token = singleToken("0")
@@ -241,7 +241,7 @@ class JsonLexerTest {
     @Test
     fun number_veryLongDigitSequence_capturedAsRawText() {
         // the lexer no longer interprets numeric value at all (no Long/Double, no overflow
-        // handling) — that's the parser's job (Milestone 2.2), reading Token.text itself.
+        // handling). That's the parser's job (Milestone 2.2), reading Token.text itself.
         val source = "99999999999999999999999999"
         val token = singleToken(source)
         assertEquals(TokenType.JNumber, token.type)

@@ -9,7 +9,7 @@ import kiit.jsonx.parser.json.JsonLexer
 /**
  * Tokenizes [JSON5](https://json5.org) text, extending [JsonLexer] with:
  * - `//` line comments and `/* */` block comments.
- * - Unquoted, identifier-style object keys (produced as [TokenType.JIdentifier] — a bare
+ * - Unquoted, identifier-style object keys (produced as [TokenType.JIdentifier]; a bare
  *   identifier is only meaningful in key position, which is [kiit.jsonx.parser.json5.Json5Parser]'s job to
  *   enforce, not the lexer's).
  * - Single-quoted strings, in addition to double-quoted.
@@ -19,7 +19,7 @@ import kiit.jsonx.parser.json.JsonLexer
  * - JSON5's wider whitespace set: `<VT>`, `<FF>`, `<NBSP>`, `<BOM>`, any Unicode space-separator
  *   character, and (unlike strict JSON) `<LS>`/`<PS>` (U+2028/U+2029) count as whitespace too.
  *
- * Still validates rather than decodes — see [JsonLexer]'s KDoc for why. Decoding JSON5-specific
+ * Still validates rather than decodes. See [JsonLexer]'s KDoc for why. Decoding JSON5-specific
  * text (hex numbers, `Infinity`/`NaN`, line-continuation removal, the wider escape set) is
  * `Json5Decoder`'s job (Milestone 2.4), not this class's.
  */
@@ -48,7 +48,7 @@ open class Json5Lexer(text: CharSequence) : JsonLexer(text) {
 
     /**
      * JSON5 whitespace is wider than strict JSON's: tab/VT/FF/space/NBSP/BOM/any Unicode
-     * space-separator, plus every line terminator (`\n`, `\r`, U+2028, U+2029 — the latter two
+     * space-separator, plus every line terminator (`\n`, `\r`, U+2028, U+2029; the latter two
      * are *not* whitespace in strict JSON, only line-position bookkeeping there). Also skips
      * `//` and `/* */` comments, which JSON5 permits anywhere whitespace is permitted.
      */
@@ -126,17 +126,17 @@ open class Json5Lexer(text: CharSequence) : JsonLexer(text) {
      * Consumes one JSON5 escape sequence, having already consumed the leading `\`. JSON5's
      * escape grammar is deliberately permissive: a line terminator here is a line continuation
      * (the string just carries on), `\xHH`/`\uHHHH` need exactly 2/4 valid hex digits, and *any
-     * other single character* is accepted as a `NonEscapeCharacter` (`\q` is simply `q`) — unlike
+     * other single character* is accepted as a `NonEscapeCharacter` (`\q` is simply `q`). Unlike
      * strict JSON, an unrecognized escape is not an error.
      */
     private fun skipJson5Escape() {
         if (state.isAtEnd()) lexError("invalid escape sequence", state.snapshot())
         val c = state.advance()
         when {
-            isLineTerminator(c) -> Unit // line continuation — \r\n already consumed as one by advance()
+            isLineTerminator(c) -> Unit // line continuation, \r\n already consumed as one by advance()
             c == 'x' -> if (!skipFixedHexDigits(2)) lexError("invalid hex escape", state.snapshot())
             c == 'u' -> if (!skipFixedHexDigits(4)) lexError("invalid unicode escape", state.snapshot())
-            else -> Unit // CharacterEscapeSequence or NonEscapeCharacter — always valid, one char
+            else -> Unit // CharacterEscapeSequence or NonEscapeCharacter: always valid, one char
         }
     }
 
@@ -205,7 +205,7 @@ open class Json5Lexer(text: CharSequence) : JsonLexer(text) {
     /**
      * Reads an unquoted identifier and classifies it: `true`/`false`/`null` remain their own
      * token types (same as strict JSON), `Infinity`/`NaN` become [TokenType.JNumber], and
-     * anything else is a bare [TokenType.JIdentifier] — only meaningful as an object key, which
+     * anything else is a bare [TokenType.JIdentifier], only meaningful as an object key, which
      * `Json5Parser` (Milestone 2.4) enforces.
      */
     private fun readIdentifierOrKeyword(position: SourcePosition): Token {
@@ -227,7 +227,7 @@ open class Json5Lexer(text: CharSequence) : JsonLexer(text) {
 
     /**
      * Approximates ECMAScript `IdentifierStart`: a Unicode letter, `$`, or `_`. Does not support
-     * `\uXXXX`-escaped characters inside an identifier — a known, deliberate simplification.
+     * `\uXXXX`-escaped characters inside an identifier: a known, deliberate simplification.
      */
     private fun isIdentifierStart(c: Char): Boolean = c.isLetter() || c == '$' || c == '_'
 

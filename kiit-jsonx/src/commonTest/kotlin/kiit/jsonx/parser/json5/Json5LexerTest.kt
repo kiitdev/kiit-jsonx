@@ -273,7 +273,7 @@ class Json5LexerTest {
     @Test
     fun number_leadingZeroFollowedByDigit_stillInvalidForDecimal() {
         // "0" followed immediately by another digit is not a valid decimal literal even in
-        // JSON5 (ECMAScript's DecimalIntegerLiteral still forbids it) — "0" alone is complete.
+        // JSON5 (ECMAScript's DecimalIntegerLiteral still forbids it). "0" alone is complete.
         val token = singleToken("0")
         assertEquals(TokenType.JNumber, token.type)
         assertEquals("0", token.text)
