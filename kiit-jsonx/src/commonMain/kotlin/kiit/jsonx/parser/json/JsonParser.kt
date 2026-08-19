@@ -26,19 +26,23 @@ import kiit.result.Success
  * [Companion.parse] is the actual public boundary: the one place that catches
  * [JsonXParseException] and converts it into a real [JsonXResult.Failure].
  *
- * Also owns decoding raw [Token.text] into real values — [JsonLexer] validates a string's
- * escapes and a number's grammar but deliberately never decodes them (see [Token]'s KDoc); that
- * happens here, in [decodeString]/[decodeNumber], which can assume well-formed input since the
- * lexer already rejected anything malformed.
+ * Delegates decoding raw [Token.text] into real values to [JsonDecoder] — tree-shape/grammar
+ * and raw-text decoding are independent concerns, and [Json5Parser] (Milestone 2.4) will likely
+ * need its own decoder (e.g. for hex numbers) without needing its own copy of this class's
+ * grammar logic.
  *
- * `open`/`protected` throughout for [Json5Parser] (Milestone 2.4) to extend rather than
- * reimplement — same extension-point philosophy as [JsonLexer].
+ * `open`/`protected` throughout for [Json5Parser] to extend rather than reimplement — same
+ * extension-point philosophy as [JsonLexer].
  */
-open class JsonParser(private val lexer: JsonLexer, private val options: ParseOptions = ParseOptions()) {
+open class JsonParser(
+    private val lexer: JsonLexer,
+    private val options: ParseOptions = ParseOptions(),
+    private val decoder: JsonDecoder = JsonDecoder(),
+) {
     protected var current: Token = lexer.nextToken()
         private set
 
-    /** Current object/array nesting depth — see [withNestingGuard]. */
+    /** Current object/array nesting depth — see [enterNesting]. */
     private var depth: Int = 0
 
     /** Parses the whole document. Empty (or whitespace-only) input yields an empty [JsonXObject]. */
@@ -90,7 +94,7 @@ open class JsonParser(private val lexer: JsonLexer, private val options: ParseOp
             // (comma continues, '}' returns) or throws, so this always terminates.
             while (true) {
                 if (current.type != TokenType.JString) parseError("expected a string key")
-                val key = decodeString(advance().text)
+                val key = decoder.decodeString(advance().text)
                 expect(TokenType.JColon)
                 putEntry(entries, tracker, key, parseValue())
 
@@ -150,9 +154,9 @@ open class JsonParser(private val lexer: JsonLexer, private val options: ParseOp
         if (depth > MAX_NESTING_DEPTH) parseError("exceeded max nesting depth of $MAX_NESTING_DEPTH")
     }
 
-    protected open fun parseString(): JsonXString = JsonXString(decodeString(advance().text))
+    protected open fun parseString(): JsonXString = JsonXString(decoder.decodeString(advance().text))
 
-    protected open fun parseNumber(): JsonXNumber = decodeNumber(advance().text)
+    protected open fun parseNumber(): JsonXNumber = decoder.decodeNumber(advance().text)
 
     /**
      * Applies [ParseOptions.duplicateKeyPolicy] when [key] repeats within one object.
@@ -185,49 +189,6 @@ open class JsonParser(private val lexer: JsonLexer, private val options: ParseOp
                     }
             }
         }
-    }
-
-    /** Decodes a raw [JsonLexer]-produced string slice (quotes + escapes) into its real value. */
-    protected open fun decodeString(rawText: String): String {
-        val inner = rawText.substring(1, rawText.length - 1)
-        val decoded = StringBuilder(inner.length)
-        var i = 0
-        while (i < inner.length) {
-            val c = inner[i]
-            if (c != '\\') {
-                decoded.append(c)
-                i++
-                continue
-            }
-            i++
-            i = decodeEscape(inner, i, decoded)
-        }
-        return decoded.toString()
-    }
-
-    /** Decodes one escape sequence starting at [index] (the leading `\` already skipped). Returns the next index. */
-    private fun decodeEscape(inner: String, index: Int, out: StringBuilder): Int {
-        when (val escaped = inner[index]) {
-            '"', '\\', '/' -> out.append(escaped)
-            'b' -> out.append('\b')
-            'f' -> out.append('\u000C')
-            'n' -> out.append('\n')
-            'r' -> out.append('\r')
-            't' -> out.append('\t')
-            'u' -> {
-                out.append(inner.substring(index + 1, index + 5).toInt(radix = 16).toChar())
-                return index + 5
-            }
-            else -> error("unreachable: JsonLexer already validated this escape")
-        }
-        return index + 1
-    }
-
-    /** Decodes a raw [JsonLexer]-produced number slice, falling back to [Double] on [Long] overflow. */
-    protected open fun decodeNumber(rawText: String): JsonXNumber {
-        val isDouble = rawText.any { it == '.' || it == 'e' || it == 'E' }
-        if (!isDouble) rawText.toLongOrNull()?.let { return JsonXNumber.of(it) }
-        return JsonXNumber.of(rawText.toDouble())
     }
 
     protected fun advance(): Token {
