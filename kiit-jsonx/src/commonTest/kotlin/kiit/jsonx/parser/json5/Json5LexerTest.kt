@@ -271,12 +271,22 @@ class Json5LexerTest {
     }
 
     @Test
-    fun number_leadingZeroFollowedByDigit_stillInvalidForDecimal() {
-        // "0" followed immediately by another digit is not a valid decimal literal even in
-        // JSON5 (ECMAScript's DecimalIntegerLiteral still forbids it). "0" alone is complete.
+    fun number_soleZero_isACompleteNumberToken() {
         val token = singleToken("0")
         assertEquals(TokenType.JNumber, token.type)
         assertEquals("0", token.text)
+    }
+
+    @Test
+    fun number_leadingZeroFollowedByDigit_stopsAtTheZero() {
+        // "010" is legacy octal syntax, disallowed even in JSON5 (ECMAScript's
+        // DecimalIntegerLiteral forbids a leading zero followed by another digit). The lexer
+        // stops at the lone "0"; it's Json5Parser that then rejects the leftover "10" as
+        // unexpected trailing content — same split responsibility as strict JSON.
+        val tokens = tokenize("010")
+        assertEquals(listOf(TokenType.JNumber, TokenType.JNumber, TokenType.JEndOfInput), tokens.map { it.type })
+        assertEquals("0", tokens[0].text)
+        assertEquals("10", tokens[1].text)
     }
 
     // --- expanded whitespace -----------------------------------------------------------------

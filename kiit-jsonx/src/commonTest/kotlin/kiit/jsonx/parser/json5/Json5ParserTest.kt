@@ -249,6 +249,12 @@ class Json5ParserTest {
         assertFailsWith<JsonXParseException> { parseDocument("{1: 2}") }
     }
 
+    @Test
+    fun error_legacyOctalNumber_fails() {
+        // "010" is legacy octal syntax, disallowed even in JSON5 — see Json5LexerTest for why.
+        assertFailsWith<JsonXParseException> { parseDocument("010") }
+    }
+
     // --- public boundary (Json5Parser.parse) ---------------------------------------------------
 
     @Test

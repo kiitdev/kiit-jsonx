@@ -80,11 +80,19 @@ open class Json5Parser(lexer: JsonLexer, options: ParseOptions = ParseOptions())
         }
     }
 
-    /** An object key: a quoted string (decoded normally) or a bare identifier (used as-is, no decoding needed). */
+    /**
+     * An object key: a quoted string (decoded normally) or a bare identifier (used as-is, no
+     * decoding needed). `null`/`true`/`false` count as identifiers here too, e.g. `{null: 1}` is
+     * valid JSON5 with the key `"null"` — ECMAScript's `IdentifierName` grammar (what JSON5 uses
+     * for property names) includes reserved words; only the narrower `Identifier` production
+     * (used for variable bindings) excludes them. The lexer still tokenizes them as
+     * [TokenType.JNull]/[TokenType.JTrue]/[TokenType.JFalse], since that's the correct
+     * classification in value position; this is where key position recovers the exception.
+     */
     private fun readKey(): String =
         when (current.type) {
             TokenType.JString -> decoder.decodeString(advance().text)
-            TokenType.JIdentifier -> advance().text
+            TokenType.JIdentifier, TokenType.JNull, TokenType.JTrue, TokenType.JFalse -> advance().text
             else -> parseError("expected a string or identifier key")
         }
 

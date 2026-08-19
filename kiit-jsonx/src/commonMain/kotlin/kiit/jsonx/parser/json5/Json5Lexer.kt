@@ -174,11 +174,19 @@ open class Json5Lexer(text: CharSequence) : JsonLexer(text) {
         return Token(TokenType.JNumber, state.slice(position.offset), position)
     }
 
-    /** Decimal literal, having already consumed an optional leading sign and ruled out hex/special forms. */
+    /**
+     * Decimal literal, having already consumed an optional leading sign and ruled out hex/special
+     * forms. A leading `0` must not be followed by another digit (no legacy octal syntax, e.g.
+     * `010`) — same ECMAScript `DecimalIntegerLiteral` restriction strict JSON already enforces;
+     * JSON5 doesn't relax this one. `0` alone still consumes fine, it just stops there.
+     */
     private fun readDecimalNumber(position: SourcePosition): Token {
         var hasDigits = false
 
-        if (state.peek()?.isAsciiDigit() == true) {
+        if (state.peek() == '0') {
+            state.advance()
+            hasDigits = true
+        } else if (state.peek()?.isAsciiDigit() == true) {
             while (state.peek()?.isAsciiDigit() == true) state.advance()
             hasDigits = true
         }
