@@ -1,5 +1,5 @@
 /** url: www.kiit.dev */
-package kiit.jsonx.parser.dialect
+package kiit.jsonx.parser.jsonx
 
 import kiit.jsonx.parser.json5.Json5Decoder
 

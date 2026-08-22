@@ -1,4 +1,4 @@
-package kiit.jsonx.parser.dialect
+package kiit.jsonx.parser.jsonx
 
 import kiit.jsonx.error.JsonXParseException
 import kiit.jsonx.parser.core.Token
