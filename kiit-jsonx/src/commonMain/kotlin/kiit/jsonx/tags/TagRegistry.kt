@@ -1,16 +1,21 @@
 /** url: www.kiit.dev */
 package kiit.jsonx.tags
 
-import kiit.jsonx.tags.builtin.EnvTagHandler
+import kiit.jsonx.tags.builtin.TableTagHandler
 
 /**
  * Which [TagHandler] resolves which tag name, scoped to one instance rather than a shared
  * global: each [kiit.jsonx.options.ParseOptions] carries its own registry, so registering a tag
  * for one parse can never leak into another's.
  *
- * 1. Every instance starts pre-seeded with the always-on built-ins (`@env`, for now) — a
- *    consumer registering one external tag shouldn't also have to re-register the built-ins to
- *    get them back.
+ * 1. Every instance starts pre-seeded with the always-on built-ins that are resolved eagerly
+ *    (`@table`, for now) — a consumer registering one external tag shouldn't also have to
+ *    re-register those to get them back. `@env` and `@ref` are deliberately *not* in this
+ *    registry at all: they're always-on tags too, but resolving them is a post-parse transform's
+ *    job (`resolveEnv`/`resolveRefs`, security- and whole-tree-context-gated respectively), never
+ *    an eager parse-time lookup. `JsonXParser` treats "unregistered" as the signal to leave a
+ *    tag as a raw `JsonXTagged` node for that later stage, so `@env`/`@ref` simply never being
+ *    registered here is what makes them deferred, no separate flag needed.
  * 2. [register] is mutating, not copy-returning: `TagRegistry().apply { register(MyTag()) }` is
  *    the intended shape, matching the PRD's own example.
  * 3. [find]/[register] require [ExperimentalJsonxTagApi] opt-in since both surface a
@@ -18,7 +23,7 @@ import kiit.jsonx.tags.builtin.EnvTagHandler
  */
 class TagRegistry {
     @OptIn(ExperimentalJsonxTagApi::class)
-    private val handlers: MutableMap<String, TagHandler> = mutableMapOf(EnvTagHandler.NAME to EnvTagHandler())
+    private val handlers: MutableMap<String, TagHandler> = mutableMapOf(TableTagHandler.NAME to TableTagHandler())
 
     fun contains(name: String): Boolean = name in handlers
 

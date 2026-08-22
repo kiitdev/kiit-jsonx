@@ -1,7 +1,7 @@
 package kiit.jsonx.options
 
 import kiit.jsonx.tags.ExperimentalJsonxTagApi
-import kiit.jsonx.tags.builtin.EnvTagHandler
+import kiit.jsonx.tags.builtin.TableTagHandler
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -21,7 +21,7 @@ class ParseOptionsTest {
 
     @Test
     fun defaultTagRegistry_isPreSeededWithBuiltins() {
-        assertTrue(ParseOptions().tagRegistry.contains(EnvTagHandler.NAME))
+        assertTrue(ParseOptions().tagRegistry.contains(TableTagHandler.NAME))
     }
 
     @Test
@@ -31,6 +31,11 @@ class ParseOptionsTest {
         val a = ParseOptions()
         val b = ParseOptions()
         assertTrue(a.tagRegistry !== b.tagRegistry)
+    }
+
+    @Test
+    fun defaultEnvAccessPolicy_isDeny() {
+        assertEquals(EnvAccessPolicy.Deny, ParseOptions().envAccessPolicy)
     }
 
     @Test

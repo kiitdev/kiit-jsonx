@@ -2,7 +2,7 @@ package kiit.jsonx.tags
 
 import kiit.jsonx.element.JsonXElement
 import kiit.jsonx.error.JsonXResult
-import kiit.jsonx.tags.builtin.EnvTagHandler
+import kiit.jsonx.tags.builtin.TableTagHandler
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -22,10 +22,10 @@ class TagRegistryTest {
     }
 
     @Test
-    fun freshRegistry_alreadyContainsEnv() {
+    fun freshRegistry_alreadyContainsTable() {
         val registry = TagRegistry()
-        assertTrue(registry.contains(EnvTagHandler.NAME))
-        assertTrue(registry.find(EnvTagHandler.NAME) is EnvTagHandler)
+        assertTrue(registry.contains(TableTagHandler.NAME))
+        assertTrue(registry.find(TableTagHandler.NAME) is TableTagHandler)
     }
 
     @Test
@@ -62,10 +62,10 @@ class TagRegistryTest {
     }
 
     @Test
-    fun register_attemptingToReRegisterEnvWithoutNamespace_fails() {
-        // "env" itself has no dot, so it's rejected by the prefix rule regardless of collision.
+    fun register_attemptingToReRegisterTableWithoutNamespace_fails() {
+        // "table" itself has no dot, so it's rejected by the prefix rule regardless of collision.
         val registry = TagRegistry()
-        assertFailsWith<IllegalArgumentException> { registry.register(FakeTag("env")) }
+        assertFailsWith<IllegalArgumentException> { registry.register(FakeTag("table")) }
     }
 
     @Test
@@ -75,7 +75,7 @@ class TagRegistryTest {
                 register(FakeTag("acmecorp.date"))
             }
         assertTrue(registry.contains("acmecorp.date"))
-        assertTrue(registry.contains(EnvTagHandler.NAME))
+        assertTrue(registry.contains(TableTagHandler.NAME))
     }
 
     @Test

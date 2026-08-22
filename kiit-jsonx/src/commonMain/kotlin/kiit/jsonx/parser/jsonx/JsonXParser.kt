@@ -6,9 +6,11 @@ import kiit.jsonx.element.JsonXElement.JsonXTagged
 import kiit.jsonx.error.JsonXParseException
 import kiit.jsonx.error.JsonXResult
 import kiit.jsonx.options.ParseOptions
+import kiit.jsonx.parser.core.SourcePosition
 import kiit.jsonx.parser.core.TokenType
 import kiit.jsonx.parser.json.JsonLexer
 import kiit.jsonx.parser.json5.Json5Parser
+import kiit.jsonx.tags.ExperimentalJsonxTagApi
 import kiit.result.Failure
 import kiit.result.Success
 
@@ -22,9 +24,14 @@ import kiit.result.Success
  * 2. Triple-quoted strings need no parser-side handling at all: [JsonXLexer] already tokenizes
  *    them as an ordinary [TokenType.JString], and [JsonXDecoder] (injected as the `decoder`)
  *    already decodes the `"""`-prefixed raw text correctly, so `parseString` is unmodified too.
- * 3. This is parsing only, not resolution: a `JsonXTagged` node is a leaf here, its `args` are
- *    plain values. Turning `@env('DB_HOST')` into an actual resolved value is a transform-stage
- *    concern (Phase 3), entirely out of scope for this class.
+ * 3. `JsonXTagged` is the universal parse-time representation of every `@name(args)` occurrence,
+ *    built unconditionally in [parseTag]. What happens next depends entirely on
+ *    [ParseOptions.tagRegistry]: a registered name (`@table`, or any externally-registered tag)
+ *    is resolved immediately and its result replaces the tagged node right there in the tree; an
+ *    unregistered name (`@env`, `@ref` — deliberately never registered, see `TagRegistry`'s
+ *    KDoc) is left as a plain `JsonXTagged` leaf for the transform pipeline to pick up later.
+ *    `TagHandler.resolve` itself does nothing but convert already-parsed `args` into a
+ *    replacement value; it has no say in whether or when it's called.
  * 4. `parseValue`/[parseTag] stay `protected open`, the same extension-point pattern used
  *    throughout this parser family, rather than a wider public surface — see the jsonx plan's
  *    note on `kiit-views` reuse for why a broader public API is deliberately not committed to yet.
@@ -37,11 +44,12 @@ open class JsonXParser(lexer: JsonLexer, options: ParseOptions = ParseOptions())
      * `@name(args)` or `@namespace.name(args)`, always parenthesized (even zero-arg: `@name()`)
      * — jsonx has no bare-tag syntax. Trailing commas in the argument list are allowed, same as
      * everywhere else in this dialect. Args are ordinary values, parsed via [parseValue], so a
-     * tag can appear inside another tag's arguments (simple tags nesting inside simple tags is
-     * fine at the parse-syntax level here; whether that's *semantically* allowed is a `TagKind`
-     * concern for Phase 3, not this class).
+     * tag can appear inside another tag's arguments (e.g. a `@table` cell using `@env(...)`) with
+     * no special-casing needed here.
      */
-    protected open fun parseTag(): JsonXTagged {
+    @OptIn(ExperimentalJsonxTagApi::class)
+    protected open fun parseTag(): JsonXElement {
+        val tagStart = current.start
         val name = advance().text.removePrefix("@")
         expect(TokenType.JLParen)
 
@@ -55,7 +63,18 @@ open class JsonXParser(lexer: JsonLexer, options: ParseOptions = ParseOptions())
             }
         }
         advance() // ')'
-        return JsonXTagged(name, args)
+
+        return resolveEagerly(name, args, tagStart)
+    }
+
+    /** Splices in a registered handler's result immediately, or leaves an unregistered tag as-is. */
+    @OptIn(ExperimentalJsonxTagApi::class)
+    private fun resolveEagerly(name: String, args: List<JsonXElement>, tagStart: SourcePosition): JsonXElement {
+        val handler = options.tagRegistry.find(name) ?: return JsonXTagged(name, args)
+        return when (val result = handler.resolve(args)) {
+            is Success -> result.value
+            is Failure -> parseError(result.error, result.status, tagStart)
+        }
     }
 
     companion object {

@@ -2,6 +2,7 @@
 package kiit.jsonx.parser.json
 
 import kiit.codes.Err
+import kiit.codes.Failed
 import kiit.jsonx.element.JsonXElement
 import kiit.jsonx.element.JsonXElement.JsonXArray
 import kiit.jsonx.element.JsonXElement.JsonXBoolean
@@ -36,7 +37,7 @@ import kiit.result.Success
  */
 open class JsonParser(
     private val lexer: JsonLexer,
-    private val options: ParseOptions = ParseOptions(),
+    protected val options: ParseOptions = ParseOptions(),
     protected val decoder: JsonDecoder = JsonDecoder(),
 ) {
     protected var current: Token = lexer.nextToken()
@@ -207,6 +208,20 @@ open class JsonParser(
     protected fun parseError(message: String, position: SourcePosition): Nothing {
         throw JsonXParseException(
             JsonXError(Err.of(message), line = position.line, column = position.column, offset = position.offset),
+        )
+    }
+
+    /**
+     * Surfaces an already-built [JsonXError] (e.g. from a [kiit.jsonx.tags.TagHandler] failure)
+     * as a parse error, stamping in [position] since the handler that built it has no parser
+     * position context of its own. Preserves the error's own [Err] detail (field/value) rather
+     * than collapsing it to a plain message, and the handler's own [status] rather than always
+     * defaulting to [Invalid.INVALID_VALUE].
+     */
+    protected fun parseError(error: JsonXError, status: Failed, position: SourcePosition): Nothing {
+        throw JsonXParseException(
+            error.copy(line = position.line, column = position.column, offset = position.offset),
+            status,
         )
     }
 
