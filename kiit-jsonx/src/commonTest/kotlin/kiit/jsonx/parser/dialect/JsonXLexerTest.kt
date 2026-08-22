@@ -8,12 +8,12 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 // =================================================================================================
-// JsonxLexerTest: hand-written fixture corpus for jsonx-specific grammar (Milestone 2.5, task 5)
+// JsonXLexerTest: hand-written fixture corpus for jsonx-specific grammar (Milestone 2.5, task 5)
 // — triple-quoted strings, @tag(args) syntax, # comments, and inherited JSON5 behavior.
 // =================================================================================================
-class JsonxLexerTest {
+class JsonXLexerTest {
     private fun tokenize(text: String): List<Token> {
-        val lexer = JsonxLexer(text)
+        val lexer = JsonXLexer(text)
         val tokens = mutableListOf<Token>()
         while (true) {
             val token = lexer.nextToken()
@@ -126,7 +126,7 @@ class JsonxLexerTest {
 
     @Test
     fun tripleQuotedString_unterminated_fails() {
-        assertFailsWith<JsonXParseException> { JsonxLexer("\"\"\"never closed").nextToken() }
+        assertFailsWith<JsonXParseException> { JsonXLexer("\"\"\"never closed").nextToken() }
     }
 
     @Test
@@ -185,7 +185,7 @@ class JsonxLexerTest {
 
     @Test
     fun tag_withNoNameAfterAt_fails() {
-        assertFailsWith<JsonXParseException> { JsonxLexer("@(").nextToken() }
+        assertFailsWith<JsonXParseException> { JsonXLexer("@(").nextToken() }
     }
 
     @Test
@@ -194,7 +194,7 @@ class JsonxLexerTest {
         // ends at "a"; "." is left for the next lex call, which fails on its own (a lone "."
         // needs a following digit to be a valid JSON5 number) — checked here via a single
         // nextToken() call, not the full tokenize() loop, since that second call throws.
-        val firstToken = JsonxLexer("@a.").nextToken()
+        val firstToken = JsonXLexer("@a.").nextToken()
         assertEquals(TokenType.JTag, firstToken.type)
         assertEquals("@a", firstToken.text)
     }
@@ -202,7 +202,7 @@ class JsonxLexerTest {
     // --- full document ---------------------------------------------------------------------------
 
     @Test
-    fun fullJsonxDocument_tokenizesInOrder() {
+    fun fullJsonXDocument_tokenizesInOrder() {
         val source =
             """
             {

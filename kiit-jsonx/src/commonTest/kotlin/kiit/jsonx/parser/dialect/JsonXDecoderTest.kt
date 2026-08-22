@@ -4,11 +4,11 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 // =================================================================================================
-// JsonxDecoderTest: triple-quoted string decoding (leading-newline trim, line continuation
+// JsonXDecoderTest: triple-quoted string decoding (leading-newline trim, line continuation
 // eating following whitespace, standard escapes) — decodeNumber is untouched, no test needed.
 // =================================================================================================
-class JsonxDecoderTest {
-    private val decoder = JsonxDecoder()
+class JsonXDecoderTest {
+    private val decoder = JsonXDecoder()
 
     @Test
     fun decodeString_tripleQuoted_plain() {

@@ -11,21 +11,21 @@ import kiit.jsonx.parser.json5.Json5Lexer
  * genuine syntactic superset of JSON5 rather than just JSON5 itself:
  *
  * 1. Triple-quoted multiline strings (`"""..."""`), TOML-aligned: a newline immediately after
- *    the opening delimiter is trimmed at decode time (not here; see `JsonxDecoder`), no
+ *    the opening delimiter is trimmed at decode time (not here; see `JsonXDecoder`), no
  *    automatic dedent, standard JSON5 escape processing plus `\`-line-continuation that also
  *    eats the following line's leading whitespace, and unescaped `"`/`""` are permitted inside
  *    (only a run of three quote characters closes the string — TOML disallows an unescaped
  *    three-quote run anywhere else, so first-match-wins is unambiguous, never a special case).
  * 2. `@name(args)`/`@namespace.name(args)` tag literals, lexed as one atomic [TokenType.JTag]
  *    token (raw text includes the leading `@` and every segment/dot). Parsing the parenthesized
- *    argument list into a `JsonxTagged` node is `JsonxParser`'s job (Milestone 2.5); this class
+ *    argument list into a `JsonXTagged` node is `JsonXParser`'s job (Milestone 2.5); this class
  *    only recognizes where a tag name starts and ends.
  * 3. `#`-style line comments, dialect-only — never added to [Json5Lexer], per the plan's
  *    explicit constraint that this stays out of spec-pure JSON5.
  *
  * Still validates rather than decodes; see `JsonLexer`'s KDoc for why.
  */
-open class JsonxLexer(text: CharSequence) : Json5Lexer(text) {
+open class JsonXLexer(text: CharSequence) : Json5Lexer(text) {
     override fun nextToken(): Token {
         skipInsignificant()
         if (state.isAtEnd()) return Token(TokenType.JEndOfInput, "", state.snapshot())

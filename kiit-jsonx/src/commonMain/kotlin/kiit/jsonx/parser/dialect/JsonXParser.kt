@@ -13,14 +13,14 @@ import kiit.result.Failure
 import kiit.result.Success
 
 /**
- * Assembles the jsonx dialect grammar on top of [JsonxLexer]'s tokens, extending [Json5Parser]
+ * Assembles the jsonx dialect grammar on top of [JsonXLexer]'s tokens, extending [Json5Parser]
  * for jsonx's one grammar addition: `@name(args)` tag literals.
  *
  * 1. Only [parseValue] is overridden, to route a [TokenType.JTag] token to [parseTag]. Every
  *    other production (objects, arrays, trailing commas, unquoted/single-quoted/triple-quoted
  *    keys and strings) is inherited unchanged from [Json5Parser]/`JsonParser`.
- * 2. Triple-quoted strings need no parser-side handling at all: [JsonxLexer] already tokenizes
- *    them as an ordinary [TokenType.JString], and [JsonxDecoder] (injected as the `decoder`)
+ * 2. Triple-quoted strings need no parser-side handling at all: [JsonXLexer] already tokenizes
+ *    them as an ordinary [TokenType.JString], and [JsonXDecoder] (injected as the `decoder`)
  *    already decodes the `"""`-prefixed raw text correctly, so `parseString` is unmodified too.
  * 3. This is parsing only, not resolution: a `JsonXTagged` node is a leaf here, its `args` are
  *    plain values. Turning `@env('DB_HOST')` into an actual resolved value is a transform-stage
@@ -29,8 +29,8 @@ import kiit.result.Success
  *    throughout this parser family, rather than a wider public surface — see the jsonx plan's
  *    note on `kiit-views` reuse for why a broader public API is deliberately not committed to yet.
  */
-open class JsonxParser(lexer: JsonLexer, options: ParseOptions = ParseOptions()) :
-    Json5Parser(lexer, options, JsonxDecoder()) {
+open class JsonXParser(lexer: JsonLexer, options: ParseOptions = ParseOptions()) :
+    Json5Parser(lexer, options, JsonXDecoder()) {
     override fun parseValue(): JsonXElement = if (current.type == TokenType.JTag) parseTag() else super.parseValue()
 
     /**
@@ -62,7 +62,7 @@ open class JsonxParser(lexer: JsonLexer, options: ParseOptions = ParseOptions())
         /** Parses [text] as the jsonx dialect, converting any [JsonXParseException] into a [JsonXResult.Failure]. */
         fun parse(text: CharSequence, options: ParseOptions = ParseOptions()): JsonXResult<JsonXElement> =
             try {
-                Success(JsonxParser(JsonxLexer(text), options).parseDocument())
+                Success(JsonXParser(JsonXLexer(text), options).parseDocument())
             } catch (e: JsonXParseException) {
                 Failure(e.error, e.status)
             }

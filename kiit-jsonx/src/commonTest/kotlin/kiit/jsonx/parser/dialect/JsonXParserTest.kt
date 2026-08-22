@@ -16,12 +16,12 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 // =================================================================================================
-// JsonxParserTest: hand-written fixture corpus for jsonx-specific grammar (Milestone 2.5, task 5)
+// JsonXParserTest: hand-written fixture corpus for jsonx-specific grammar (Milestone 2.5, task 5)
 // — @tag(args) tree construction, triple-quoted strings end-to-end, and inherited JSON5 behavior.
 // =================================================================================================
-class JsonxParserTest {
+class JsonXParserTest {
     private fun parseDocument(text: String, options: ParseOptions = ParseOptions()): JsonXElement =
-        JsonxParser(JsonxLexer(text), options).parseDocument()
+        JsonXParser(JsonXLexer(text), options).parseDocument()
 
     // --- inherited JSON5 behavior still works --------------------------------------------------
 
@@ -151,17 +151,17 @@ class JsonxParserTest {
         assertFailsWith<JsonXParseException> { parseDocument("@range(1,,)") }
     }
 
-    // --- public boundary (JsonxParser.parse) ---------------------------------------------------
+    // --- public boundary (JsonXParser.parse) ---------------------------------------------------
 
     @Test
     fun parse_validInput_returnsSuccess() {
-        val result = JsonxParser.parse("@env('X')")
+        val result = JsonXParser.parse("@env('X')")
         assertTrue(result is Success)
         assertEquals(JsonXTagged("env", listOf(JsonXString("X"))), result.value)
     }
 
     @Test
     fun parse_invalidInput_returnsFailure() {
-        assertTrue(JsonxParser.parse("@env(") is Failure)
+        assertTrue(JsonXParser.parse("@env(") is Failure)
     }
 }

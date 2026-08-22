@@ -4,7 +4,7 @@ package kiit.jsonx.parser.dialect
 import kiit.jsonx.parser.json5.Json5Decoder
 
 /**
- * Decodes raw [JsonxLexer]-produced `Token.text` slices for the jsonx dialect's one addition
+ * Decodes raw [JsonXLexer]-produced `Token.text` slices for the jsonx dialect's one addition
  * beyond JSON5: triple-quoted strings. Numbers need no dialect-specific decoding, so
  * [decodeNumber] is inherited from [Json5Decoder] unchanged.
  *
@@ -14,7 +14,7 @@ import kiit.jsonx.parser.json5.Json5Decoder
  * terminator itself; this is a jsonx-specific widening, kept local to this class rather than
  * touching [Json5Decoder]).
  */
-open class JsonxDecoder : Json5Decoder() {
+open class JsonXDecoder : Json5Decoder() {
     override fun decodeString(rawText: String): String {
         if (!rawText.startsWith("\"\"\"")) return super.decodeString(rawText)
 
