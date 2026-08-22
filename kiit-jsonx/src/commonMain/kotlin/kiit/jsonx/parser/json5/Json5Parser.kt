@@ -9,6 +9,7 @@ import kiit.jsonx.error.JsonXResult
 import kiit.jsonx.options.ParseOptions
 import kiit.jsonx.parser.core.DuplicateKeyTracker
 import kiit.jsonx.parser.core.TokenType
+import kiit.jsonx.parser.json.JsonDecoder
 import kiit.jsonx.parser.json.JsonLexer
 import kiit.jsonx.parser.json.JsonParser
 import kiit.result.Failure
@@ -26,8 +27,11 @@ import kiit.result.Success
  * 3. A bare identifier is only valid in key position: `parseValue`'s inherited fallthrough
  *    already rejects one anywhere else, exactly as JSON5 requires.
  */
-open class Json5Parser(lexer: JsonLexer, options: ParseOptions = ParseOptions()) :
-    JsonParser(lexer, options, Json5Decoder()) {
+open class Json5Parser(
+    lexer: JsonLexer,
+    options: ParseOptions = ParseOptions(),
+    decoder: JsonDecoder = Json5Decoder(),
+) : JsonParser(lexer, options, decoder) {
     /**
      * Same shape as [JsonParser.parseObject], but the loop condition itself (not an explicit
      * branch per separator) is what makes a trailing comma legal: consuming a comma and then
