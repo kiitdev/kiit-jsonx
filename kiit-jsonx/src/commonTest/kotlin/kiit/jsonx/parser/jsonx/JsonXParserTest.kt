@@ -2,6 +2,7 @@ package kiit.jsonx.parser.jsonx
 
 import kiit.jsonx.element.JsonXElement
 import kiit.jsonx.element.JsonXElement.JsonXArray
+import kiit.jsonx.element.JsonXElement.JsonXBoolean
 import kiit.jsonx.element.JsonXElement.JsonXNumber
 import kiit.jsonx.element.JsonXElement.JsonXObject
 import kiit.jsonx.element.JsonXElement.JsonXString
@@ -94,10 +95,36 @@ class JsonXParserTest {
 
     @Test
     fun tag_argsCanBeObjectsAndArrays() {
-        val result = parseDocument("@table({a: 1}, [1, 2])") as JsonXTagged
-        assertEquals("table", result.name)
+        // "grid" is deliberately not a registered tag name, so this stays a raw JsonXTagged node —
+        // the point here is generic arg-shape parsing, not any particular built-in's semantics.
+        val result = parseDocument("@grid({a: 1}, [1, 2])") as JsonXTagged
+        assertEquals("grid", result.name)
         assertEquals(JsonXObject(linkedMapOf("a" to JsonXNumber.of(1L))), result.args[0])
         assertEquals(JsonXArray(listOf(JsonXNumber.of(1L), JsonXNumber.of(2L))), result.args[1])
+    }
+
+    // --- @table: eager resolution splices the result in place of the tag node --------------------
+
+    @Test
+    fun tag_table_isResolvedEagerlyInPlaceOfTagNode() {
+        val source =
+            """
+            {rows: @table({names: ['name', 'active'], rows: [['Superman', true], ['Batman', true]]})}
+            """.trimIndent()
+        val result = parseDocument(source) as JsonXObject
+        val expected =
+            JsonXArray(
+                listOf(
+                    JsonXObject(linkedMapOf("name" to JsonXString("Superman"), "active" to JsonXBoolean(true))),
+                    JsonXObject(linkedMapOf("name" to JsonXString("Batman"), "active" to JsonXBoolean(true))),
+                ),
+            )
+        assertEquals(expected, result.entries["rows"])
+    }
+
+    @Test
+    fun tag_table_resolutionFailure_raisesParseException() {
+        assertFailsWith<JsonXParseException> { parseDocument("@table({rows: [['a'], ['b', 'c']]})") }
     }
 
     // --- triple-quoted strings end-to-end -------------------------------------------------------

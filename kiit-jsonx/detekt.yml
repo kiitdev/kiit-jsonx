@@ -20,3 +20,4 @@ style:
 complexity:
   TooManyFunctions:
     thresholdInClasses: 20   # a lexer needs one small, focused read-helper per grammar rule
+    thresholdInFiles: 30     # the extraction API is one function per type x suffix, by design
