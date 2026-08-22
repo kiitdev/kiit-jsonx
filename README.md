@@ -1,5 +1,7 @@
 # kiit-jsonx
 
+![jsonx logo](./spec/jsonx-logo.png)
+
 Extensible JSON library for configuration — a Kotlin Multiplatform tree parser supporting strict
 JSON, JSON5, a jsonx superset dialect (triple-quoted strings, typed `@tag(args)` literals), and
 JsonL (line-delimited JSON).
@@ -7,6 +9,10 @@ JsonL (line-delimited JSON).
 > **Status: Phase 2 (Lexer & Parser), Milestone 2.2 done.** Strict JSON parses end to end. JSON5
 > and the jsonx dialect aren't implemented yet. See [`_prd/jsonx`](../_prd/jsonx) in the
 > workspace root for the full PRD and phased plan.
+
+<p align="center">
+  <img src="./spec/jsonx-sample.png" alt="jsonx logo">
+</p>
 
 ## What's here today
 
