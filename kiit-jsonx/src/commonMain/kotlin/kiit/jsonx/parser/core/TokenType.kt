@@ -24,6 +24,8 @@ enum class TokenType(val ch: Char? = null) {
     JRBracket(']'),
     JColon(':'),
     JComma(','),
+    JLParen('('),
+    JRParen(')'),
     JString,
     JNumber,
     JTrue,
@@ -32,6 +34,9 @@ enum class TokenType(val ch: Char? = null) {
 
     /** An unquoted identifier-style token, e.g. a JSON5 unquoted object key. Not produced by strict JSON. */
     JIdentifier,
+
+    /** A jsonx `@name` or `@namespace.name` tag literal, raw text included (e.g. `@env`, `@acmecorp.date`). */
+    JTag,
 
     /** Terminal. Once `JsonLexer.nextToken` returns this, every later call returns it again. */
     JEndOfInput,

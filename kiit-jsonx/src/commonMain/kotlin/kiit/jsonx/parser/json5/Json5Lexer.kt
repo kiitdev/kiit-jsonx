@@ -66,14 +66,14 @@ open class Json5Lexer(text: CharSequence) : JsonLexer(text) {
     }
 
     /** JSON5's wider whitespace: space/tab/VT/FF/NBSP/BOM/any Unicode space-separator, plus every line terminator. */
-    private fun isJson5Whitespace(c: Char): Boolean =
+    protected fun isJson5Whitespace(c: Char): Boolean =
         c == ' ' || c == '\t' || c == '\n' || c == '\r' ||
             c == '\u000B' || c == '\u000C' ||
             c == '\u00A0' || c == '\uFEFF' ||
             c == '\u2028' || c == '\u2029' ||
             c.category == CharCategory.SPACE_SEPARATOR
 
-    private fun skipLineComment() {
+    protected fun skipLineComment() {
         state.advance() // first '/'
         state.advance() // second '/'
         while (!state.isAtEnd() && !isLineTerminator(state.peek()!!)) {
@@ -82,7 +82,7 @@ open class Json5Lexer(text: CharSequence) : JsonLexer(text) {
         // The line terminator itself is left for the outer skipInsignificant loop to consume.
     }
 
-    private fun skipBlockComment() {
+    protected fun skipBlockComment() {
         val start = state.snapshot()
         state.advance() // '/'
         state.advance() // '*'
@@ -130,7 +130,7 @@ open class Json5Lexer(text: CharSequence) : JsonLexer(text) {
      * other single character* is accepted as a `NonEscapeCharacter` (`\q` is simply `q`). Unlike
      * strict JSON, an unrecognized escape is not an error.
      */
-    private fun skipJson5Escape() {
+    protected fun skipJson5Escape() {
         if (state.isAtEnd()) lexError("invalid escape sequence", state.snapshot())
         val c = state.advance()
         when {
@@ -217,7 +217,7 @@ open class Json5Lexer(text: CharSequence) : JsonLexer(text) {
      * anything else is a bare [TokenType.JIdentifier], only meaningful as an object key, which
      * `Json5Parser` (Milestone 2.4) enforces.
      */
-    private fun readIdentifierOrKeyword(position: SourcePosition): Token {
+    protected fun readIdentifierOrKeyword(position: SourcePosition): Token {
         val start = state.offset
         state.advance() // identifier-start char, already confirmed by the caller
         while (!state.isAtEnd() && isIdentifierPart(state.peek()!!)) state.advance()
@@ -238,10 +238,10 @@ open class Json5Lexer(text: CharSequence) : JsonLexer(text) {
      * Approximates ECMAScript `IdentifierStart`: a Unicode letter, `$`, or `_`. Does not support
      * `\uXXXX`-escaped characters inside an identifier: a known, deliberate simplification.
      */
-    private fun isIdentifierStart(c: Char): Boolean = c.isLetter() || c == '$' || c == '_'
+    protected fun isIdentifierStart(c: Char): Boolean = c.isLetter() || c == '$' || c == '_'
 
     /** Approximates ECMAScript `IdentifierPart`: [isIdentifierStart] plus any Unicode digit. */
-    private fun isIdentifierPart(c: Char): Boolean = isIdentifierStart(c) || c.isDigit()
+    protected fun isIdentifierPart(c: Char): Boolean = isIdentifierStart(c) || c.isDigit()
 
-    private fun isLineTerminator(c: Char): Boolean = c == '\n' || c == '\r' || c == '\u2028' || c == '\u2029'
+    protected fun isLineTerminator(c: Char): Boolean = c == '\n' || c == '\r' || c == '\u2028' || c == '\u2029'
 }
