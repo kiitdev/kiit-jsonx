@@ -6,10 +6,11 @@ package kiit.jsonx.tags
  * [TagRegistry.find]).
  *
  * 1. `TagHandler` is the highest-stakes public API surface in this library, per the jsonx plan:
- *    it's only been proven against `@table`, a `Simple`-kind handler resolved eagerly during
- *    parsing. `TagKind.Structural` remains declared but unimplemented — no current tag needs a
- *    custom sub-grammar, `@table` turned out to be expressible as ordinary arguments — so the
- *    interface hasn't been proven against that case at all.
+ *    it's been proven against `@table` (a built-in, eagerly-resolved `Simple`-kind handler) and
+ *    against an external, consumer-registered `Simple`-kind tag, including nested-tag composition
+ *    across eager and deferred handlers. `TagKind.Structural` remains declared but unimplemented —
+ *    no current tag needs a custom sub-grammar — so the interface hasn't been proven against that
+ *    case at all.
  * 2. `WARNING`, not `ERROR`: using the interface today is fine, just not yet a stability promise.
  *    If a future external or `Structural` tag forces a shape change, that change won't be a
  *    silent break for anyone who opted in, since opting in already means "I know this might move."
@@ -17,8 +18,8 @@ package kiit.jsonx.tags
 @RequiresOptIn(
     level = RequiresOptIn.Level.WARNING,
     message =
-        "TagHandler is proven against only one real implementation (@table) so far, and only " +
-            "for TagKind.Simple. Its shape may still change before a Structural-kind tag validates it further.",
+        "TagHandler is proven against @table and an external Simple-kind tag so far, including " +
+            "nested-tag composition. Its shape may still change before a Structural-kind tag validates it further.",
 )
 @Retention(AnnotationRetention.BINARY)
 annotation class ExperimentalJsonxTagApi
